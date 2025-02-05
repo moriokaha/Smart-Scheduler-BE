@@ -23,8 +23,7 @@ namespace SmartScheduler.Data
         public DbSet<ServiceGroup> ServiceGroups { get; set; }
         public DbSet<EmployeeService> EmployeServices { get; set; }
         public DbSet<AppointmentService> AppointmentServices { get; set; }
-        public DbSet<State> States { get; set; }
-        public DbSet<Event> Events { get; set; }
         public DbSet<Calendar> Calendars { get; set; }
+        public DbSet<AppointmentState> AppointmentStates { get; set; }
     }
 }

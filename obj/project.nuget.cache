@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LQSeiEWFSgY=",
+  "dgSpecHash": "Y2LWF9+r/3Q=",
   "success": true,
-  "projectFilePath": "C:\\Development\\Sms\\Smart-Scheduler-BE\\SmartScheduler\\SmartScheduler.csproj",
+  "projectFilePath": "C:\\Development\\Sms\\BE\\SmartScheduler.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\marius.ungureanu\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\marius.ungureanu\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.1\\microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",

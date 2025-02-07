@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Development\\Sms\\BE\\SmartScheduler.csproj": {}
+    "C:\\Development\\Sms\\BE\\SmartScheduler\\SmartScheduler.csproj": {}
   },
   "projects": {
-    "C:\\Development\\Sms\\BE\\SmartScheduler.csproj": {
+    "C:\\Development\\Sms\\BE\\SmartScheduler\\SmartScheduler.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Development\\Sms\\BE\\SmartScheduler.csproj",
+        "projectUniqueName": "C:\\Development\\Sms\\BE\\SmartScheduler\\SmartScheduler.csproj",
         "projectName": "SmartScheduler",
-        "projectPath": "C:\\Development\\Sms\\BE\\SmartScheduler.csproj",
+        "projectPath": "C:\\Development\\Sms\\BE\\SmartScheduler\\SmartScheduler.csproj",
         "packagesPath": "C:\\Users\\marius.ungureanu\\.nuget\\packages\\",
-        "outputPath": "C:\\Development\\Sms\\BE\\obj\\",
+        "outputPath": "C:\\Development\\Sms\\BE\\SmartScheduler\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

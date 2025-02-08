@@ -1,6 +1,6 @@
 ﻿namespace SmartScheduler.Data.Models
 {
-    public class AppointmentService
+    public class AppointmentServiceMapping
     {
         public int Id { get; set; }
         public required  int AppointmentId { get; set; } // FK to Appointments table

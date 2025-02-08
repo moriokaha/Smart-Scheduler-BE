@@ -1,14 +1,19 @@
-﻿namespace SmartScheduler.Data.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace SmartScheduler.Data.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        public int Id { get; set; }
         public string? Name { get; set; }
-        public required string Email { get; set; }
-        public required string Password { get; set; }
-        public string UserName { get; set; } = string.Empty;
         public string? Department { get; set; }
-        public required Role Role { get; set; }
+        public Role Role { get; set; } = Role.User;
         public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+    }
+
+    public enum Role
+    {
+        User = 0,
+        Admin = 1,
+        Manager = 2
     }
 }

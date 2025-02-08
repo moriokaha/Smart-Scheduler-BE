@@ -1,8 +1,8 @@
 [
   {
     "ContainingType": "SmartScheduler.Controllers.AppointmentsController",
-    "Method": "Get",
-    "RelativePath": "Appointments",
+    "Method": "GetAllAppointments",
+    "RelativePath": "api/Appointments",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -17,7 +17,38 @@
         ],
         "StatusCode": 200
       }
+    ]
+  },
+  {
+    "ContainingType": "SmartScheduler.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "SmartScheduler.Data.Models.LoginModel",
+        "IsRequired": true
+      }
     ],
-    "EndpointName": "GetAppointments"
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SmartScheduler.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/auth/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "SmartScheduler.Data.Models.RegisterModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

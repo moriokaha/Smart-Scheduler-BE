@@ -5,7 +5,7 @@ using SmartScheduler.Services;
 
 namespace SmartScheduler.Controllers
 {
-    //[Authorize(Roles = "Admin, Manager")]
+    [Authorize(Roles = "Admin, Manager")]
     [ApiController]
     [Route("api/[controller]")]
     public class AppointmentsController : ControllerBase
@@ -38,6 +38,12 @@ namespace SmartScheduler.Controllers
                 _logger.LogError(ex, "An error occurred while retrieving appointments.");
                 return StatusCode(500, new { message = "An internal server error occurred." });
             }
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok("Test endpoint working");
         }
     }
 }

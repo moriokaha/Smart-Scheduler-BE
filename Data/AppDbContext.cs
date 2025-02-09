@@ -1,26 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SmartScheduler.Data.Models;
 
 namespace SmartScheduler.Data
 {
-    public class AppDbContext : IdentityDbContext<User>
+    public class AppDbContext(DbContextOptions<AppDbContext> options, IConfiguration configuration) : DbContext(options)
     {
-        private readonly IConfiguration _configuration;
-
-        public AppDbContext(DbContextOptions<AppDbContext> options, IConfiguration configuration)
-            : base(options)
-        {
-            _configuration = configuration;
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             if (!options.IsConfigured)
             {
-                options.UseNpgsql(_configuration.GetConnectionString("WebApiDatabase"));
+                options.UseNpgsql(configuration.GetConnectionString("WebApiDatabase"));
             }
         }
+
+        public DbSet<User> Users { get; set; }
 
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Location> Locations { get; set; }
@@ -32,14 +25,5 @@ namespace SmartScheduler.Data
         public DbSet<AppointmentServiceMapping> AppointmentServices { get; set; }
         public DbSet<Calendar> Calendars { get; set; }
         public DbSet<AppointmentState> AppointmentStates { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-
-            builder.Entity<User>()
-                .Property(u => u.Role)
-                .HasConversion<string>();
-        }
     }
 }

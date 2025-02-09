@@ -1,102 +1,64 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using SmartScheduler.Data.Models;
+using SmartScheduler.Services;
 
 namespace SmartScheduler.Controllers
 {
     [Route("api/auth")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController(IAuthService authService) : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IConfiguration _configuration;
-
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-        }
-
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<ActionResult<User>> Register(UserDto request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var user = await authService.RegisterAsync(request);
 
-            if (!Enum.TryParse<Role>(model.Role, out var userRole))
+            if (user is null)
             {
-                return BadRequest("Invalid role value. Accepted values: User, Admin, Manager.");
+                return BadRequest("Username already exists.");
             }
 
-            var user = new User
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                Role = userRole
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            // Adaugă utilizatorul într-un rol
-            await _userManager.AddToRoleAsync(user, userRole.ToString());
-
-            return Ok(new { message = "User created successfully" });
+            return Ok(user);
         }
+
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<ActionResult<TokenResponseDto>> Login(UserDto request)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return Unauthorized("User not found");
+           var response = await authService.LoginAsync(request);
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-            if (!result.Succeeded) return Unauthorized("Invalid password");
+            if (response is null) {
+                return BadRequest("Invalid username or password.");
+            }
 
-            var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            return Ok(response);
         }
 
-        private string GenerateJwtToken(User user)
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto request)
         {
-            var jwtKey = _configuration["Jwt:Key"]
-                ?? throw new Exception("JWT Key is missing in appsettings.json");
-
-            var jwtIssuer = _configuration["Jwt:Issuer"]
-                ?? throw new Exception("JWT Issuer is missing in appsettings.json");
-
-            var jwtAudience = _configuration["Jwt:Audience"]
-                ?? throw new Exception("JWT Audience is missing in appsettings.json");
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>
+            var result = await authService.RefreshTokensAsync(request);
+            if (result is null || result.AccessToken is null || result.RefreshToken is null )
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, user.Role.ToString()) // 🔹 Adaugă rolul
-            };
+                return Unauthorized("Invalid refresh token");
+            }
 
-            var token = new JwtSecurityToken(
-                issuer: jwtIssuer,
-                audience: jwtAudience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(result);
         }
 
+        [Authorize]
+        [HttpGet]
+        public IActionResult AuthenticatedOnlyEndpoint()
+        {
+            return Ok("You are authentcated!");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin-only")]
+        public IActionResult AdminOnlyEndpoint()
+        {
+            return Ok("You are an admin!");
+        }
     }
 }

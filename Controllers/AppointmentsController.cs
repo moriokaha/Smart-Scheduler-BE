@@ -5,7 +5,7 @@ using SmartScheduler.Services;
 
 namespace SmartScheduler.Controllers
 {
-    [Authorize(Roles = "Admin, Manager")]
+    [Authorize(Roles = "Admin, User, Manager")]
     [ApiController]
     [Route("api/[controller]")]
     public class AppointmentsController : ControllerBase

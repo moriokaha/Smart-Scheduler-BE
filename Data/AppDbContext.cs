@@ -14,16 +14,18 @@ namespace SmartScheduler.Data
         }
 
         public DbSet<User> Users { get; set; }
-
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<Service> Services { get; set; }
-        public DbSet<ServiceType> ServiceTypes { get; set; }
-        public DbSet<ServiceGroup> ServiceGroups { get; set; }
-        public DbSet<EmployeeService> EmployeServices { get; set; }
-        public DbSet<AppointmentServiceMapping> AppointmentServices { get; set; }
-        public DbSet<Calendar> Calendars { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<JobType> JobTypes { get; set; }
+        public DbSet<JobGroup> JobGroups { get; set; }
+        public DbSet<EmployeeJob> EmployeJobs { get; set; }
+        public DbSet<AppointmentJob> AppointmenTasks { get; set; }
         public DbSet<AppointmentState> AppointmentStates { get; set; }
+        public DbSet<AppointmentJob> AppointmentJobs { get; set; }
+        public DbSet<LocationWorkInterval> LocationWorkIntervals { get; set; }
+        public DbSet<EmployeeWorkInterval> EmployeeWorkIntervals { get; set; }
+        public DbSet<EmployeeHolliday> EmployeeHollidays { get; set; }
     }
 }

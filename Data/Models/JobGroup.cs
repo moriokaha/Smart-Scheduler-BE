@@ -1,6 +1,6 @@
 ﻿namespace SmartScheduler.Data.Models
 {
-    public class ServiceGroup
+    public class JobGroup
     {
         public int Id { get; set; }
         public required string Name { get; set; }

@@ -29,7 +29,7 @@ namespace SmartScheduler.Services
             return await CreateTokenResponse(user);
         }
 
-        public async Task<User?> RegisterAsync(UserDto request)
+        public async Task<User?> RegisterUserAsync(UserDto request)
         {
             if(await context.Users.AnyAsync(u => u.UserName == request.UserName))
             {
@@ -42,6 +42,29 @@ namespace SmartScheduler.Services
 
             user.UserName = request.UserName;
             user.PasswordHash = hashedPassword;
+            user.Role = "User";
+
+            context.Users.Add(user);
+
+            await context.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<User?> RegisterManagerAsync(UserDto request)
+        {
+            if (await context.Users.AnyAsync(u => u.UserName == request.UserName))
+            {
+                return null;
+            }
+
+            var user = new User();
+
+            var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
+
+            user.UserName = request.UserName;
+            user.PasswordHash = hashedPassword;
+            user.Role = "Manager";
 
             context.Users.Add(user);
 

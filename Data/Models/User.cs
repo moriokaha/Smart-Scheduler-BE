@@ -3,12 +3,10 @@
     public class User
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public required string Email { get; set; }
-        public required string Password { get; set; }
         public string UserName { get; set; } = string.Empty;
-        public string? Department { get; set; }
-        public required Role Role { get; set; }
-        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }

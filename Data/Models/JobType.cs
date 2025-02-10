@@ -1,6 +1,6 @@
 ﻿namespace SmartScheduler.Data.Models
 {
-    public class ServiceType
+    public class JobType
     {
         public int Id { get; set; }
         public required string Name { get; set; }
@@ -8,6 +8,6 @@
         public int ServiceGroupId { get; set; } // FK to ServiceGroup table
 
         // Proprietate de navigație
-        public required virtual ServiceGroup ServiceGroup { get; set; }
+        public required virtual JobGroup ServiceGroup { get; set; }
     }
 }

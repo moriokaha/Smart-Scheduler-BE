@@ -30,14 +30,24 @@ namespace SmartScheduler.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CalendarId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
                     b.Property<int>("LocationId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -48,7 +58,7 @@ namespace SmartScheduler.Migrations
                     b.ToTable("Appointments");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentService", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentJob", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,10 +78,10 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("EmployeeServiceId");
 
-                    b.ToTable("AppointmentServices");
+                    b.ToTable("AppointmentJob");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.Calendar", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentState", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,18 +89,24 @@ namespace SmartScheduler.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<int>("AppointmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("text");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("StateChangedDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsGlobal")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Calendars");
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
+
+                    b.ToTable("AppointmentStates");
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Employee", b =>
@@ -118,7 +134,29 @@ namespace SmartScheduler.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeService", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeHolliday", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmployeeHollidays");
+                });
+
+            modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeJob", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -145,10 +183,10 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("EmployeServices");
+                    b.ToTable("EmployeJobs");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.Event", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeWorkInterval", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -156,37 +194,91 @@ namespace SmartScheduler.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CalendarId")
+                    b.Property<int>("Day")
                         .HasColumnType("integer");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeOnly>("TimeEnd")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<TimeOnly>("TimeStart")
+                        .HasColumnType("time without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmployeeWorkIntervals");
+                });
+
+            modelBuilder.Entity("SmartScheduler.Data.Models.Job", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan>("CompletionTime")
+                        .HasColumnType("interval");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("EventEnd")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("EventStart")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("LocationId")
+                    b.Property<int>("ServiceTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("StateId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceTypeId");
+
+                    b.ToTable("Jobs");
+                });
+
+            modelBuilder.Entity("SmartScheduler.Data.Models.JobGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    b.Property<string>("Title")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CalendarId");
+                    b.ToTable("JobGroups");
+                });
 
-                    b.HasIndex("LocationId");
+            modelBuilder.Entity("SmartScheduler.Data.Models.JobType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.HasIndex("StateId");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.ToTable("Events");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ServiceGroupId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceGroupId");
+
+                    b.ToTable("JobTypes");
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Location", b =>
@@ -214,23 +306,7 @@ namespace SmartScheduler.Migrations
                     b.ToTable("Locations");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.Role", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RoleId"));
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("SmartScheduler.Data.Models.Service", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.LocationWorkInterval", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -238,86 +314,21 @@ namespace SmartScheduler.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<TimeSpan>("CompletionTime")
-                        .HasColumnType("interval");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ServiceTypeId")
+                    b.Property<int>("Day")
                         .HasColumnType("integer");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeOnly>("TimeEnd")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<TimeOnly>("TimeStart")
+                        .HasColumnType("time without time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceTypeId");
-
-                    b.ToTable("Services");
-                });
-
-            modelBuilder.Entity("SmartScheduler.Data.Models.ServiceGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServiceGroups");
-                });
-
-            modelBuilder.Entity("SmartScheduler.Data.Models.ServiceType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ServiceGroupId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceGroupId");
-
-                    b.ToTable("ServiceTypes");
-                });
-
-            modelBuilder.Entity("SmartScheduler.Data.Models.State", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("States");
+                    b.ToTable("LocationWorkIntervals");
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.User", b =>
@@ -328,33 +339,25 @@ namespace SmartScheduler.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Department")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -378,7 +381,7 @@ namespace SmartScheduler.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentService", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentJob", b =>
                 {
                     b.HasOne("SmartScheduler.Data.Models.Appointment", "Appointment")
                         .WithMany()
@@ -386,7 +389,7 @@ namespace SmartScheduler.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SmartScheduler.Data.Models.EmployeeService", "EmployeeService")
+                    b.HasOne("SmartScheduler.Data.Models.EmployeeJob", "EmployeeService")
                         .WithMany()
                         .HasForeignKey("EmployeeServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -395,6 +398,15 @@ namespace SmartScheduler.Migrations
                     b.Navigation("Appointment");
 
                     b.Navigation("EmployeeService");
+                });
+
+            modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentState", b =>
+                {
+                    b.HasOne("SmartScheduler.Data.Models.Appointment", null)
+                        .WithOne("AppointmentState")
+                        .HasForeignKey("SmartScheduler.Data.Models.AppointmentState", "AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Employee", b =>
@@ -408,7 +420,7 @@ namespace SmartScheduler.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeService", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeJob", b =>
                 {
                     b.HasOne("SmartScheduler.Data.Models.Employee", "Employee")
                         .WithMany()
@@ -416,7 +428,7 @@ namespace SmartScheduler.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SmartScheduler.Data.Models.Service", "Service")
+                    b.HasOne("SmartScheduler.Data.Models.Job", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -427,34 +439,9 @@ namespace SmartScheduler.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.Event", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.Job", b =>
                 {
-                    b.HasOne("SmartScheduler.Data.Models.Calendar", null)
-                        .WithMany("Events")
-                        .HasForeignKey("CalendarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartScheduler.Data.Models.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartScheduler.Data.Models.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("State");
-                });
-
-            modelBuilder.Entity("SmartScheduler.Data.Models.Service", b =>
-                {
-                    b.HasOne("SmartScheduler.Data.Models.ServiceType", "ServiceType")
+                    b.HasOne("SmartScheduler.Data.Models.JobType", "ServiceType")
                         .WithMany()
                         .HasForeignKey("ServiceTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -463,9 +450,9 @@ namespace SmartScheduler.Migrations
                     b.Navigation("ServiceType");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.ServiceType", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.JobType", b =>
                 {
-                    b.HasOne("SmartScheduler.Data.Models.ServiceGroup", "ServiceGroup")
+                    b.HasOne("SmartScheduler.Data.Models.JobGroup", "ServiceGroup")
                         .WithMany()
                         .HasForeignKey("ServiceGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -474,20 +461,10 @@ namespace SmartScheduler.Migrations
                     b.Navigation("ServiceGroup");
                 });
 
-            modelBuilder.Entity("SmartScheduler.Data.Models.User", b =>
+            modelBuilder.Entity("SmartScheduler.Data.Models.Appointment", b =>
                 {
-                    b.HasOne("SmartScheduler.Data.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.Navigation("AppointmentState")
                         .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("SmartScheduler.Data.Models.Calendar", b =>
-                {
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

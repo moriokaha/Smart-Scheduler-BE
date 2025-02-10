@@ -3,27 +3,29 @@ using SmartScheduler.Data.Models;
 
 namespace SmartScheduler.Data
 {
-    public class AppDbContext(IConfiguration configuration) : DbContext
+    public class AppDbContext(DbContextOptions<AppDbContext> options, IConfiguration configuration) : DbContext(options)
     {
-        protected readonly IConfiguration Configuration = configuration;
-
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            //connect to postgress with connection string from app settings 
-            options.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
+            if (!options.IsConfigured)
+            {
+                options.UseNpgsql(configuration.GetConnectionString("WebApiDatabase"));
+            }
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<Service> Services { get; set; }
-        public DbSet<ServiceType> ServiceTypes { get; set; }
-        public DbSet<ServiceGroup> ServiceGroups { get; set; }
-        public DbSet<EmployeeService> EmployeServices { get; set; }
-        public DbSet<AppointmentService> AppointmentServices { get; set; }
-        public DbSet<Calendar> Calendars { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<JobType> JobTypes { get; set; }
+        public DbSet<JobGroup> JobGroups { get; set; }
+        public DbSet<EmployeeJob> EmployeJobs { get; set; }
+        public DbSet<AppointmentJob> AppointmenTasks { get; set; }
         public DbSet<AppointmentState> AppointmentStates { get; set; }
+        public DbSet<AppointmentJob> AppointmentJobs { get; set; }
+        public DbSet<LocationWorkInterval> LocationWorkIntervals { get; set; }
+        public DbSet<EmployeeWorkInterval> EmployeeWorkIntervals { get; set; }
+        public DbSet<EmployeeHolliday> EmployeeHollidays { get; set; }
     }
 }

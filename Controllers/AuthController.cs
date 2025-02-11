@@ -12,7 +12,13 @@ namespace SmartScheduler.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDto request)
         {
-            var user = await authService.RegisterAsync(request);
+            var validRoles = new List<string> { "User", "Manager"};
+            if (!validRoles.Contains(request.Role))
+            {
+                return BadRequest("Invalid role.");
+            }
+
+            var user = await authService.RegisterUserAsync(request);
 
             if (user is null)
             {
@@ -45,20 +51,6 @@ namespace SmartScheduler.Controllers
             }
 
             return Ok(result);
-        }
-
-        [Authorize]
-        [HttpGet]
-        public IActionResult AuthenticatedOnlyEndpoint()
-        {
-            return Ok("You are authentcated!");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("admin-only")]
-        public IActionResult AdminOnlyEndpoint()
-        {
-            return Ok("You are an admin!");
         }
     }
 }

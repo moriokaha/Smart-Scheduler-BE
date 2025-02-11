@@ -55,7 +55,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentJob", b =>
@@ -78,7 +78,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("EmployeeServiceId");
 
-                    b.ToTable("AppointmentJob");
+                    b.ToTable("AppointmentJob", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.AppointmentState", b =>
@@ -106,7 +106,7 @@ namespace SmartScheduler.Migrations
                     b.HasIndex("AppointmentId")
                         .IsUnique();
 
-                    b.ToTable("AppointmentStates");
+                    b.ToTable("AppointmentStates", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Employee", b =>
@@ -131,7 +131,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeHolliday", b =>
@@ -153,7 +153,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeHollidays");
+                    b.ToTable("EmployeeHollidays", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeJob", b =>
@@ -183,7 +183,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("EmployeJobs");
+                    b.ToTable("EmployeJobs", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.EmployeeWorkInterval", b =>
@@ -208,7 +208,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeWorkIntervals");
+                    b.ToTable("EmployeeWorkIntervals", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Job", b =>
@@ -236,7 +236,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("ServiceTypeId");
 
-                    b.ToTable("Jobs");
+                    b.ToTable("Jobs", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.JobGroup", b =>
@@ -253,7 +253,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("JobGroups");
+                    b.ToTable("JobGroups", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.JobType", b =>
@@ -278,7 +278,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasIndex("ServiceGroupId");
 
-                    b.ToTable("JobTypes");
+                    b.ToTable("JobTypes", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Location", b =>
@@ -303,7 +303,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.LocationWorkInterval", b =>
@@ -328,7 +328,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LocationWorkIntervals");
+                    b.ToTable("LocationWorkIntervals", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.User", b =>
@@ -359,7 +359,7 @@ namespace SmartScheduler.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("SmartScheduler.Data.Models.Appointment", b =>

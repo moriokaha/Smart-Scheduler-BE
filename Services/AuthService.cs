@@ -31,43 +31,21 @@ namespace SmartScheduler.Services
 
         public async Task<User?> RegisterUserAsync(UserDto request)
         {
-            if(await context.Users.AnyAsync(u => u.UserName == request.UserName))
-            {
-                return null;
-            }
-
-            var user = new User();
-
-            var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
-
-            user.UserName = request.UserName;
-            user.PasswordHash = hashedPassword;
-            user.Role = "User";
-
-            context.Users.Add(user);
-
-            await context.SaveChangesAsync();
-
-            return user;
-        }
-
-        public async Task<User?> RegisterManagerAsync(UserDto request)
-        {
             if (await context.Users.AnyAsync(u => u.UserName == request.UserName))
             {
                 return null;
             }
 
-            var user = new User();
+            var user = new User
+            {
+                UserName = request.UserName,
+                Role = request.Role
+            };
 
             var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
-
-            user.UserName = request.UserName;
             user.PasswordHash = hashedPassword;
-            user.Role = "Manager";
 
             context.Users.Add(user);
-
             await context.SaveChangesAsync();
 
             return user;

@@ -4,10 +4,8 @@ namespace SmartScheduler.Services
 {
     public interface IAppointmentService
     {
-        Task<List<Appointment>> GetAllAppointmentsAsync();
-        Task<Appointment> GetAppointmentByIdAsync(int id);
-        Task<Appointment> CreateAppointmentAsync(Appointment appointment);
-        Task UpdateAppointmentAsync(Appointment appointment);
-        Task DeleteAppointmentAsync(int id);
+        Task<IEnumerable<Appointment>> GetAllAppointmentsAsync();
+        Task<IEnumerable<Appointment>> GetAppointmentsByLocationAsync(string location);
+        Task<IEnumerable<Appointment>> GetAppointmentsByUserIdAsync(int userId);
     }
 }

@@ -12,8 +12,7 @@ namespace SmartScheduler.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDto request)
         {
-            var validRoles = new List<string> { "User", "Manager"};
-            if (!validRoles.Contains(request.Role))
+            if (!Enum.IsDefined(request.Role))
             {
                 return BadRequest("Invalid role.");
             }
@@ -27,7 +26,6 @@ namespace SmartScheduler.Controllers
 
             return Ok(user);
         }
-
 
         [HttpPost("login")]
         public async Task<ActionResult<TokenResponseDto>> Login(UserDto request)

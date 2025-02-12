@@ -4,48 +4,28 @@ using SmartScheduler.Data.Models;
 
 namespace SmartScheduler.Services
 {
-    public class AppointmentService(AppDbContext context, IConfiguration configuration) : IAppointmentService
+    public class AppointmentService(AppDbContext _context) : IAppointmentService
     {
-
-        public async Task<List<Appointment>> GetAllAppointmentsAsync()
+        public async Task<IEnumerable<Appointment>> GetAllAppointmentsAsync()
         {
-            return await context.Appointments
+            return await _context.Appointments.Include(a => a.Location).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Appointment>> GetAppointmentsByLocationAsync(string location)
+        {
+            return await _context.Appointments
                 .Include(a => a.Location)
-                .Include(a => a.Employee)
+                .Where(a => a.Location.Name == location)
                 .ToListAsync();
         }
 
-        public async Task<Appointment?> GetAppointmentByIdAsync(int id)
+        public async Task<IEnumerable<Appointment>> GetAppointmentsByUserIdAsync(int userId)
         {
-            Appointment? appointment = await context.Appointments
-                .Include(a => a.Location)
-                .Include(a => a.Employee)
-                .FirstOrDefaultAsync(a => a.Id == id);
-
-            return appointment;
-        }
-
-        public async Task<Appointment> CreateAppointmentAsync(Appointment appointment)
-        {
-            context.Appointments.Add(appointment);
-            await context.SaveChangesAsync();
-            return appointment;
-        }
-
-        public async Task UpdateAppointmentAsync(Appointment appointment)
-        {
-            context.Entry(appointment).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAppointmentAsync(int id)
-        {
-            var appointment = await context.Appointments.FindAsync(id);
-            if (appointment != null)
-            {
-                context.Appointments.Remove(appointment);
-                await context.SaveChangesAsync();
-            }
+            return await _context.Appointments
+                                 .Include(a => a.Location)
+                                 .Include(a => a.Employee)
+                                 .Where(a => a.EmployeeId == userId)
+                                 .ToListAsync();
         }
     }
 }

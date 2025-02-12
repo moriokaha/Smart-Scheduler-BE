@@ -12,7 +12,12 @@ namespace SmartScheduler.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDto request)
         {
-            var user = await authService.RegisterAsync(request);
+            if (!Enum.IsDefined(request.Role))
+            {
+                return BadRequest("Invalid role.");
+            }
+
+            var user = await authService.RegisterUserAsync(request);
 
             if (user is null)
             {
@@ -21,7 +26,6 @@ namespace SmartScheduler.Controllers
 
             return Ok(user);
         }
-
 
         [HttpPost("login")]
         public async Task<ActionResult<TokenResponseDto>> Login(UserDto request)
@@ -45,20 +49,6 @@ namespace SmartScheduler.Controllers
             }
 
             return Ok(result);
-        }
-
-        [Authorize]
-        [HttpGet]
-        public IActionResult AuthenticatedOnlyEndpoint()
-        {
-            return Ok("You are authentcated!");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("admin-only")]
-        public IActionResult AdminOnlyEndpoint()
-        {
-            return Ok("You are an admin!");
         }
     }
 }

@@ -11,5 +11,13 @@
         public required virtual Location Location { get; set; }
         public required virtual Employee Employee { get; set; }
         public required virtual AppointmentState AppointmentState { get; set; }
+
+        // Opțional user
+        public int? UserId { get; set; }
+        public virtual User? User { get; set; }
+
+        // For anonymous clients
+        public string? ClientName { get; set; }
+        public string? ClientPhone { get; set; }
     }
 }

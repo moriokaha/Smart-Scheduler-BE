@@ -8,7 +8,7 @@ namespace SmartScheduler.Services
         Task<IEnumerable<Appointment>> GetAppointmentsByLocationAsync(string location);
         Task<IEnumerable<Appointment>> GetAppointmentsByUserIdAsync(int userId);
         Task<Employee> GetEmployeeByIdAsync(int employeeId);
-        Task<Location> GetLocationByNameAsync(string locationName);
+        Task<Location> GetLocationByIdAsync(int locationId);
         Task<Appointment> CreateAppointmentAsync(Appointment appointment);
     }
 }

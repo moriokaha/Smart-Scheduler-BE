@@ -30,33 +30,21 @@ namespace SmartScheduler.Services
 
         public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         {
-            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == employeeId);
-
-            if (employee == null)
-            {
-                throw new Exception("Employee not found.");
-            }
-
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == employeeId) ?? throw new Exception("Employee not found.");
             return employee;
         }
 
-        public async Task<Location> GetLocationByNameAsync(string locationName)
+        public async Task<Location> GetLocationByIdAsync(int locationId)
         {
-            var location = await _context.Locations.FirstOrDefaultAsync(l => l.Name == locationName);
+            var location = await _context.Locations.FirstOrDefaultAsync(l => l.Id == locationId);
 
-            if (location == null)
-            {
-                throw new Exception("Location not found.");
-            }
-
-            return location;
+            return location ?? throw new Exception("Location not found.");
         }
 
         public async Task<Appointment> CreateAppointmentAsync(Appointment appointment)
         {
             var employee = await GetEmployeeByIdAsync(appointment.EmployeeId);
-
-            var location = await GetLocationByNameAsync(appointment.Location.Name);
+            var location = await GetLocationByIdAsync(appointment.Location.Id);
 
             appointment.Location = location;
             appointment.Employee = employee;

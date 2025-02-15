@@ -71,9 +71,13 @@ namespace SmartScheduler.Controllers
         {
             try
             {
-                if (appointment == null)
+                // Validate appointment data
+                var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var validationError = ValidateAppointment(appointment, userId);
+
+                if (validationError != null)
                 {
-                    return BadRequest(new { message = "Invalid appointment data." });
+                    return BadRequest(new { message = validationError });
                 }
 
                 // Check if employee exists
@@ -84,30 +88,14 @@ namespace SmartScheduler.Controllers
                 }
 
                 // Check if the location exists
-                var location = await _appointmentsService.GetLocationByNameAsync(appointment.Location.Name);
+                var location = await _appointmentsService.GetLocationByIdAsync(appointment.Location.Id);
                 if (location == null)
                 {
                     return BadRequest(new { message = "Selected location does not exist." });
                 }
 
-                // Check if the user is authnticated
-                var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-                if (userId != null)
-                {
-                    // If the user is logged in, we associate the UserId and remove ClientName/ClientPhone
-                    appointment.UserId = int.Parse(userId);
-                    appointment.ClientName = null;
-                    appointment.ClientPhone = null;
-                }
-                else
-                {
-                    // If the user is NOT logged in, ClientName and ClientPhone are required
-                    if (string.IsNullOrWhiteSpace(appointment.ClientName) || string.IsNullOrWhiteSpace(appointment.ClientPhone))
-                    {
-                        return BadRequest(new { message = "For anonymous appointments, ClientName and ClientPhone are required." });
-                    }
-                }
+                // Assign UserId if authenticated
+                appointment.UserId = userId != null ? int.Parse(userId) : (int?)null;
 
                 // Save the appointment
                 var createdAppointment = await _appointmentsService.CreateAppointmentAsync(appointment);
@@ -119,6 +107,25 @@ namespace SmartScheduler.Controllers
                 _logger.LogError(ex, "An error occurred while creating an appointment.");
                 return StatusCode(500, new { message = "An internal server error occurred." });
             }
+        }
+
+        /// <summary>
+        /// Validates the appointment data before processing.
+        /// </summary>
+        /// <returns>Null if no errors, otherwise an error message.</returns>
+        private string ValidateAppointment(Appointment appointment, string userId)
+        {
+            if (appointment == null)
+            {
+                return "Invalid appointment data.";
+            }
+
+            if (userId == null && (string.IsNullOrWhiteSpace(appointment.ClientName) || string.IsNullOrWhiteSpace(appointment.ClientPhone)))
+            {
+                return "Client information was not provided.";
+            }
+
+            return null; // No errors
         }
     }
 }

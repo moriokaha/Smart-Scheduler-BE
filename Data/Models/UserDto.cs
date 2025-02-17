@@ -6,7 +6,7 @@ namespace SmartScheduler.Data.Models
     {
         public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-       public UserRole Role { get; set; } = UserRole.User;
+        public UserRole Role { get; set; } = UserRole.User;
     }
 
     public enum UserRole

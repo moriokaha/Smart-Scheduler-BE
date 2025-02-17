@@ -39,7 +39,7 @@ namespace SmartScheduler.Services
             var user = new User
             {
                 UserName = request.UserName,
-                Role = request.Role
+                Role = request.Role.ToString(),
             };
 
             var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);

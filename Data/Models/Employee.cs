@@ -1,8 +1,7 @@
 ﻿namespace SmartScheduler.Data.Models
 {
-    public class Employee
+    public class Employee: BaseEntity
     {
-        public int Id { get; set; }
         public required string Name { get; set; }
         public string?  Description { get; set; }
         public required int LocationId { get; set; } // FK to Locations table

@@ -3,7 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using SmartScheduler.Data;
+using SmartScheduler.Middlewares;
+using SmartScheduler.Repositories;
+using SmartScheduler.Repositories.Contracts;
 using SmartScheduler.Services;
+using SmartScheduler.Services.Contracts;
 using System.Text;
 
 namespace SmartScheduler
@@ -32,8 +36,12 @@ namespace SmartScheduler
                     };
                 });
 
+            builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
 
 
             builder.Services.AddAuthorization();
@@ -45,6 +53,7 @@ namespace SmartScheduler
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
 
             if (app.Environment.IsDevelopment())
             {

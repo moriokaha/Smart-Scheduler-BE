@@ -1,8 +1,7 @@
 ﻿namespace SmartScheduler.Data.Models
 {
-    public class Appointment
+    public class Appointment: BaseEntity
     {
-        public int Id { get; set; }
         public int CalendarId { get; set; } // FK to Calendar table
         public string Title { get; set; } = "Appointment";
         public string? Description { get; set; }

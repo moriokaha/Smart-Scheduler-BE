@@ -1,68 +1,56 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartScheduler.Data.Models;
-using SmartScheduler.Services;
-using System.Security.Claims;
+using SmartScheduler.Exceptions;
+using SmartScheduler.Helpers;
+using SmartScheduler.Services.Contracts;
+using System.Net;
 
 namespace SmartScheduler.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AppointmentsController(ILogger<AppointmentsController> _logger, IAppointmentService _appointmentsService) : ControllerBase
+    public class AppointmentsController(ILogger<AppointmentsController> _logger, IAppointmentService _appointmentsService, IEmployeeService _employeeService, ILocationService _locationService) : ControllerBase
     {
         [HttpGet]
         [Authorize(Roles = "Admin, User, Manager")]
         public async Task<ActionResult<IEnumerable<Appointment>>> GetAllAppointments()
         {
-            try
+            IEnumerable<Appointment> appointments;
+            var tokenUserData = HttpHelper.GetUserDataFromToken(HttpContext.Request);
+
+            if (tokenUserData.Role == UserRole.Admin)
             {
-                IEnumerable<Appointment> appointments;
-
-                if (User.IsInRole("Admin"))
-                {
-                    // The admin can see all appointments from all locations.
-                    appointments = await _appointmentsService.GetAllAppointmentsAsync();
-                }
-                else if (User.IsInRole("Manager"))
-                {
-                    // The manager can only see appointments from their location.
-                    var userLocation = User.Claims.FirstOrDefault(c => c.Type == "Location")?.Value;
-                    if (userLocation == null)
-                    {
-                        return Unauthorized(new { message = "Location not assigned." });
-                    }
-
-                    appointments = await _appointmentsService.GetAppointmentsByLocationAsync(userLocation);
-                }
-                else if (User.IsInRole("User"))
-                {
-                    // The user (simple) can only see their own appointments.
-                    var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                    if (userId == null)
-                    {
-                        return Unauthorized(new { message = "User ID not found." });
-                    }
-
-                    appointments = await _appointmentsService.GetAppointmentsByUserIdAsync(int.Parse(userId));
-                }
-                else
-                {
-                    return Unauthorized(new { message = "Access denied." });
-                }
-
-                if (appointments == null || appointments.Count() == 0)
-                {
-                    _logger.LogInformation("No appointments found.");
-                    return NotFound(new { message = "No appointments found." });
-                }
-
-                return Ok(appointments);
+                // The admin can see all appointments from all locations.
+                appointments = await _appointmentsService.GetAllAppointmentsAsync();
             }
-            catch (Exception ex)
+            else if (tokenUserData.Role == UserRole.Manager)
             {
-                _logger.LogError(ex, "An error occurred while retrieving appointments.");
-                return StatusCode(500, new { message = "An internal server error occurred." });
+                // The manager can only see appointments from their location.
+                var userLocation = User.Claims.FirstOrDefault(c => c.Type == "Location")?.Value;
+                
+                if (userLocation == null)
+                {
+                    throw new ClientException("Location not assigned.", HttpStatusCode.Unauthorized);
+                }
+
+                appointments = await _appointmentsService.GetAppointmentsByLocationAsync(userLocation);
             }
+            else if (tokenUserData.Role == UserRole.User)
+            {
+                appointments = await _appointmentsService.GetAppointmentsByUserIdAsync(tokenUserData.Id);
+            }
+            else
+            {
+                throw new ClientException("Access denied.", HttpStatusCode.Unauthorized);
+            }
+
+            if (appointments == null || appointments.Count() == 0)
+            {
+                throw new ClientException("No appointments found.", HttpStatusCode.NotFound);
+            }
+
+            return Ok(appointments);
         }
 
         [HttpPost]
@@ -72,30 +60,30 @@ namespace SmartScheduler.Controllers
             try
             {
                 // Validate appointment data
-                var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                var validationError = ValidateAppointment(appointment, userId);
+                var tokenUserData = HttpHelper.GetUserDataFromToken(HttpContext.Request);
+                var validationError = ValidateAppointment(appointment);
 
                 if (validationError != null)
                 {
-                    return BadRequest(new { message = validationError });
+                    throw new ClientException(validationError, HttpStatusCode.BadRequest);
                 }
 
                 // Check if employee exists
-                var employee = await _appointmentsService.GetEmployeeByIdAsync(appointment.EmployeeId);
+                var employee = await _employeeService.GetByIdAsync(appointment.EmployeeId);
                 if (employee == null)
                 {
-                    return BadRequest(new { message = "Selected employee does not exist." });
+                    throw new ClientException("Selected employee does not exist.", HttpStatusCode.BadRequest);
                 }
 
                 // Check if the location exists
-                var location = await _appointmentsService.GetLocationByIdAsync(appointment.Location.Id);
+                var location = await _locationService.GetByIdAsync(appointment.Location.Id);
                 if (location == null)
                 {
-                    return BadRequest(new { message = "Selected location does not exist." });
+                    throw new ClientException("Selected location does not exist.", HttpStatusCode.BadRequest);
                 }
 
                 // Assign UserId if authenticated
-                appointment.UserId = userId != null ? int.Parse(userId) : (int?)null;
+                appointment.UserId = tokenUserData.Id;
 
                 // Save the appointment
                 var createdAppointment = await _appointmentsService.CreateAppointmentAsync(appointment);
@@ -104,8 +92,7 @@ namespace SmartScheduler.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating an appointment.");
-                return StatusCode(500, new { message = "An internal server error occurred." });
+                throw new ClientException("An internal server error occurred.", HttpStatusCode.BadRequest);
             }
         }
 
@@ -113,14 +100,14 @@ namespace SmartScheduler.Controllers
         /// Validates the appointment data before processing.
         /// </summary>
         /// <returns>Null if no errors, otherwise an error message.</returns>
-        private string ValidateAppointment(Appointment appointment, string userId)
+        private static string? ValidateAppointment(Appointment appointment)
         {
             if (appointment == null)
             {
                 return "Invalid appointment data.";
             }
 
-            if (userId == null && (string.IsNullOrWhiteSpace(appointment.ClientName) || string.IsNullOrWhiteSpace(appointment.ClientPhone)))
+            if (string.IsNullOrWhiteSpace(appointment.ClientName) || string.IsNullOrWhiteSpace(appointment.ClientPhone))
             {
                 return "Client information was not provided.";
             }

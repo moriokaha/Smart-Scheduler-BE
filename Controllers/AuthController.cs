@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SmartScheduler.Data.Models;
-using SmartScheduler.Services;
+using SmartScheduler.Exceptions;
+using SmartScheduler.Services.Contracts;
+using System.Net;
 
 namespace SmartScheduler.Controllers
 {
@@ -14,14 +15,14 @@ namespace SmartScheduler.Controllers
         {
             if (!Enum.IsDefined(request.Role))
             {
-                return BadRequest("Invalid role.");
+                throw new ClientException("Invalid role.", HttpStatusCode.BadRequest);
             }
 
             var user = await authService.RegisterUserAsync(request);
 
             if (user is null)
             {
-                return BadRequest("Username already exists.");
+                throw new ClientException("Username already exists.", HttpStatusCode.BadRequest);
             }
 
             return Ok(user);
@@ -32,8 +33,9 @@ namespace SmartScheduler.Controllers
         {
            var response = await authService.LoginAsync(request);
 
-            if (response is null) {
-                return BadRequest("Invalid username or password.");
+            if (response is null)
+            {
+                throw new ClientException("Invalid username or password.", HttpStatusCode.BadRequest);
             }
 
             return Ok(response);
@@ -45,7 +47,7 @@ namespace SmartScheduler.Controllers
             var result = await authService.RefreshTokensAsync(request);
             if (result is null || result.AccessToken is null || result.RefreshToken is null )
             {
-                return Unauthorized("Invalid refresh token");
+                throw new ClientException("Invalid refresh token", HttpStatusCode.Unauthorized);
             }
 
             return Ok(result);

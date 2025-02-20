@@ -12,6 +12,7 @@ namespace SmartScheduler.Data.Models
     public enum UserRole
     {
         User,
-        Manager
+        Manager,
+        Admin
     }
 }

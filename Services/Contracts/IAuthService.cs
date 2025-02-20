@@ -1,6 +1,6 @@
 ﻿using SmartScheduler.Data.Models;
 
-namespace SmartScheduler.Services
+namespace SmartScheduler.Services.Contracts
 {
     public interface IAuthService
     {

@@ -1,40 +1,46 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SmartScheduler.Data;
-using SmartScheduler.Data.Models;
+﻿using SmartScheduler.Data.Models;
+using SmartScheduler.Repositories.Contracts;
 using SmartScheduler.Services.Contracts;
 
 namespace SmartScheduler.Services
 {
-    public class AppointmentService(AppDbContext _context) : IAppointmentService
+    public class AppointmentService : IAppointmentService
     {
-        public async Task<IEnumerable<Appointment>> GetAllAppointmentsAsync()
+        private readonly IAppointmentRepository _appointmentRepository;
+
+        public AppointmentService(IAppointmentRepository appointmentRepository)
         {
-            return await _context.Appointments.Include(a => a.Location).ToListAsync();
+            _appointmentRepository = appointmentRepository;
+        }
+
+        public async Task<IEnumerable<Appointment>> GetAllAsync()
+        {
+            return await _appointmentRepository.GetAllAsync();
         }
 
         public async Task<IEnumerable<Appointment>> GetAppointmentsByLocationAsync(string location)
         {
-            return await _context.Appointments
-                .Include(a => a.Location)
-                .Where(a => a.Location.Name == location)
-                .ToListAsync();
+            return await _appointmentRepository.GetAppointmentsByLocationAsync(location);
         }
 
         public async Task<IEnumerable<Appointment>> GetAppointmentsByUserIdAsync(int userId)
         {
-            return await _context.Appointments
-                                 .Include(a => a.Location)
-                                 .Include(a => a.Employee)
-                                 .Where(a => a.EmployeeId == userId)
-                                 .ToListAsync();
+            return await _appointmentRepository.GetAppointmentsByUserIdAsync(userId);
         }
 
-        public async Task<Appointment> CreateAppointmentAsync(Appointment appointment)
+        public async Task<Appointment> CreateAsync(Appointment appointment)
         {
-            _context.Appointments.Add(appointment);
-            await _context.SaveChangesAsync();
+            return await _appointmentRepository.CreateAsync(appointment);
+        }
 
-            return appointment;
+        public async Task<Appointment> UpdateAsync(Appointment appointment)
+        {
+            return await _appointmentRepository.UpdateAsync(appointment);
+        }
+
+        public async Task DeleteAsync(int appointmentId)
+        {
+            await _appointmentRepository.DeleteByIdAsync(appointmentId);
         }
     }
 }

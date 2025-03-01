@@ -22,7 +22,7 @@ namespace SmartScheduler.Controllers
             if (tokenUserData.Role == UserRole.Admin)
             {
                 // The admin can see all appointments from all locations.
-                appointments = await _appointmentsService.GetAllAppointmentsAsync();
+                appointments = await _appointmentsService.GetAllAsync();
             }
             else if (tokenUserData.Role == UserRole.Manager)
             {
@@ -86,7 +86,7 @@ namespace SmartScheduler.Controllers
                 appointment.UserId = tokenUserData.Id;
 
                 // Save the appointment
-                var createdAppointment = await _appointmentsService.CreateAppointmentAsync(appointment);
+                var createdAppointment = await _appointmentsService.CreateAsync(appointment);
 
                 return CreatedAtAction(nameof(GetAllAppointments), new { id = createdAppointment.Id }, createdAppointment);
             }

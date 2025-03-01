@@ -36,6 +36,7 @@ namespace SmartScheduler
                     };
                 });
 
+            builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 

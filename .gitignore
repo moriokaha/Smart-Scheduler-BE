@@ -2,6 +2,7 @@
 obj/
 bin/
 /bin/Debug/net9.0/
+/bin/Debug/net9.0/SmartScheduler.deps.json
 /bin/Debug/net9.0/SmartScheduler.dll
 /bin/Debug/net9.0/SmartScheduler.exe
 /bin/Debug/net9.0/SmartScheduler.pdb

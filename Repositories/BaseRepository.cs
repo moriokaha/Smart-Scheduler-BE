@@ -89,7 +89,7 @@ namespace SmartScheduler.Repositories
             }
             catch (Exception)
             {
-                throw new ClientException("Unexpected error occurred", HttpStatusCode.InternalServerError);
+                throw new ClientException("Could not update entity", HttpStatusCode.InternalServerError);
             }
         }
     }

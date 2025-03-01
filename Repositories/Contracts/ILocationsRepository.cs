@@ -2,12 +2,8 @@
 
 namespace SmartScheduler.Repositories.Contracts
 {
-    public interface ILocationsRepository 
+    public interface ILocationsRepository : IBaseRepository<Location>
     {
-        Task<IEnumerable<Location>> GetAllAsync();
-        Task<Location?> GetByIdAsync(int locationId);
-        Task<Location> CreateAsync(Location location);
-        Task<Location> UpdateAsync(Location location);
-        Task DeleteAsync(int locationId);
+       
     }
 }

@@ -42,7 +42,7 @@ namespace SmartScheduler.Services
                 throw new Exception("Location not found.");
             }
 
-            await _repository.DeleteAsync(locationId);
+            await _repository.DeleteByIdAsync(locationId);
         }
 
         private static void ValidateLocation(Location location)

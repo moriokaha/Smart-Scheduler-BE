@@ -59,20 +59,37 @@ namespace SmartScheduler.Repositories
 
         public virtual async Task<TEntity> UpdateAsync(TEntity entity)
         {
-            if (entity == null || entity.Id <= 0) { 
+            if (entity == null || entity.Id <= 0)
+            {
                 throw new ClientException("Cannot update entity", HttpStatusCode.BadRequest);
             }
 
-            EntityTable.Update(entity);
-
             try
             {
-                _ = await Context.SaveChangesAsync();
-                return entity;
+                var existingEntity = await EntityTable.FirstOrDefaultAsync(e => e.Id == entity.Id);
+
+                if (existingEntity == null)
+                {
+                    throw new ClientException($"Entity with ID {entity.Id} not found", HttpStatusCode.NotFound);
+                }
+
+                // Update the existing entity's properties with the values from the provided entity
+                Context.Entry(existingEntity).CurrentValues.SetValues(entity);
+
+                // Mark the existing entity as modified so that EF Core knows to update it
+                Context.Entry(existingEntity).State = EntityState.Modified;
+
+                await Context.SaveChangesAsync();
+
+                return existingEntity;
+            }
+            catch (DbUpdateException)
+            {
+                throw new ClientException("Database update failed", HttpStatusCode.InternalServerError);
             }
             catch (Exception)
             {
-                throw new ClientException("Could not update entity", HttpStatusCode.InternalServerError);
+                throw new ClientException("Unexpected error occurred", HttpStatusCode.InternalServerError);
             }
         }
     }

@@ -18,7 +18,10 @@ namespace SmartScheduler.Repositories
                 throw new ClientException("Invalid location id", HttpStatusCode.BadRequest);
             }
 
-            var employees = await Context.Employees.Where(e => e.LocationId == locationId).Include(e => e.Location).ToListAsync();
+            var employees = await Context.Employees
+                .Where(e => e.LocationId == locationId)
+                .ToListAsync();
+
             return employees;
         }
     }
